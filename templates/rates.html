@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Exchange Rate Update</title>
+</head>
+<body>
+    <h1>Exchange Rate Update</h1>
+    {% for currency, exchange_rate in exchange_rates.items() %}
+        <p>The current exchange rate of 1 USD to {{ currency }} is {{ exchange_rate }}</p>
+    {% endfor %}
+</body>
+</html>
