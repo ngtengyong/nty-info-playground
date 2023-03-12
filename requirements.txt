@@ -3,3 +3,5 @@ beautifulsoup4==4.10.0
 requests==2.26.0
 google-cloud-datastore==2.2.0
 protobuf==3.20.1
+routes==2.5
+connexion[swagger-ui]==2.7.0
