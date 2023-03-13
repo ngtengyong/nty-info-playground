@@ -35,6 +35,7 @@ def fetch_exchange_rates():
         entity = datastore.Entity(key=client.key('exchange_rates'))
         entity.update({
             'timestamp': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'date': datetime.datetime.now().strftime('%Y-%m-%d'),  # Add the date property
             'from_currency_code': 'USD',
             'from': 1,
             'to_currency_code': currency,
