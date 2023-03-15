@@ -1,6 +1,7 @@
 from flask import Flask
 
-app = Flask(__name__)
+# app = Flask(__name__)
+app = Flask(__name__, static_folder='img')
 
 # fetch SEA currency rates api
 from routes.exchange_rates_api import exchange_rates_api_bp

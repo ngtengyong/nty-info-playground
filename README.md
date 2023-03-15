@@ -19,3 +19,6 @@ latest exchange rates url: https://nty-info-center.as.r.appspot.com/exchange-rat
 
 * Clean up unused indexes based and keep what's mentioned in index.yaml<br>
 ```gcloud datastore indexes cleanup index.yaml```
+
+* Install required package <br>
+```pip install -r requirements.txt```

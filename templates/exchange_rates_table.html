@@ -18,8 +18,7 @@
     <body>
         <div id="map" style="height: 500px;"></div>
       </body>
-
-           
+      
     <table>
         <thead>
             <tr>
@@ -42,7 +41,69 @@
     </table>
     <script>
 
-var countries = {{ countries|tojson }};
+    var countries = [    
+    {        
+        name: "Brunei",     
+        currency: "BND",        
+        value: 1.3430929999999999,        
+        latlng: [4.5353, 114.7277]
+    },
+    {
+        name: "Indonesia",
+        currency: "IDR",
+        value: 15387.2,
+        latlng: [-0.7893, 113.9213]
+    },
+    {
+        name: "Cambodia",
+        currency: "KHR",
+        value: 4042.69,
+        latlng: [12.5657, 104.991]
+    },
+    {
+        name: "Laos",
+        currency: "LAK",
+        value: 16857.89,
+        latlng: [19.8563, 102.4955]
+    },
+    {
+        name: "Myanmar",
+        currency: "MMK",
+        value: 2096.882,
+        latlng: [21.9162, 95.956]
+    },
+    {
+        name: "Malaysia",
+        currency: "MYR",
+        value: 4.4745,
+        latlng: [4.2105, 101.9758]
+    },
+    {
+        name: "Philippines",
+        currency: "PHP",
+        value: 54.9635,
+        latlng: [12.8797, 121.774]
+    },
+    {
+        name: "Singapore",
+        currency: "SGD",
+        value: 1.3432849999999998,
+        latlng: [1.3521, 103.8198]
+    },
+    {
+        name: "Thailand",
+        currency: "THB",
+        value: 34.550000000000004,
+        latlng: [15.8700, 100.9925]
+    },
+    {
+        name: "Vietnam",
+        currency: "VND",
+        value: 23580.0,
+        latlng: [14.0583, 108.2772]
+    }
+];
+
 var map = L.map('map').setView([10, 105], 4);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -63,6 +124,10 @@ for (var i = 0; i < countries.length; i++) {
     });
     var marker = L.marker(country.latlng, { icon: markerIcon }).addTo(map);
 }
+
+
+
+
     </script>
 </body>
 </html>
