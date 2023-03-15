@@ -1,49 +1,81 @@
 from flask import Blueprint, render_template
-import requests
-from bs4 import BeautifulSoup
 from google.cloud import datastore
-import datetime
 
 exchange_rates_bp = Blueprint('exchange_rates', __name__)
 
-@exchange_rates_bp.route('/exchange-rates', methods=['POST'])
-def fetch_exchange_rates():
-    # Define the currencies to search for
-    currencies = ['MYR','VND','PHP','THB','SGD','KHR','MMK','BND','LAK','IDR']
-    exchange_rates = {}
+# @exchange_rates_bp.route('/exchange-rates', methods=['GET'])
+# def display_exchange_rates():
+#     # Create a client to interact with the Datastore API
+#     client = datastore.Client()
 
+#     query = client.query(kind='exchange_rates')
+#     query.order = ['-timestamp']
+#     query_dict = {}
+#     for rate in query.fetch():
+#         if rate['to_currency_code'] not in query_dict:
+#             query_dict[rate['to_currency_code']] = rate
+#     result = query_dict.values()
+
+#     # Execute the query and get all results
+#     results = list(query.fetch())
+
+#     # Define a dictionary mapping currency codes to country names
+#     currencies_to_countries = {'MYR': 'Malaysia', 'VND': 'Vietnam', 'PHP': 'Philippines', 'THB': 'Thailand', 'SGD': 'Singapore', 'KHR': 'Cambodia', 'MMK': 'Myanmar', 'BND': 'Brunei', 'LAK': 'Laos', 'IDR': 'Indonesia'}
+
+#     # Initialize a list to store the exchange rate records
+#     exchange_rates_records = []
+
+#     # Loop over all entities and extract the relevant information
+#     for entity in results:
+#         exchange_rate_record = {
+#             'to_currency_code': entity['to_currency_code'],
+#             'equivalent_value': entity['to'],
+#             'last_updated_on': entity['timestamp']
+#         }
+
+#         # Check if the entity has a 'to_currency_country' property
+#         if 'to_currency_country' in entity:
+#             exchange_rate_record['country'] = entity['to_currency_country']
+#         else:
+#             # Use the currencies_to_countries mapping to get the country name
+#             exchange_rate_record['country'] = currencies_to_countries.get(entity['to_currency_code'])
+
+#         exchange_rates_records.append(exchange_rate_record)
+
+#     # Render the exchange rates template with the records
+#     return render_template('exchange_rates.html', records=exchange_rates_records)
+
+@exchange_rates_bp.route('/exchange-rates', methods=['GET'])
+def display_exchange_rates():
     # Create a client to interact with the Datastore API
     client = datastore.Client()
 
-    # Iterate over each currency and fetch the exchange rate
-    for currency in currencies:
-        url = f"https://www.google.com/search?q=1+USD+to+{currency}"
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
-        res = requests.get(url, headers=headers)
+    # Define a dictionary mapping currency codes to country names
+    currencies_to_countries = {'MYR': 'Malaysia', 'VND': 'Vietnam', 'PHP': 'Philippines', 'THB': 'Thailand', 'SGD': 'Singapore', 'KHR': 'Cambodia', 'MMK': 'Myanmar', 'BND': 'Brunei', 'LAK': 'Laos', 'IDR': 'Indonesia'}
 
-        # Parse the HTML response using Beautiful Soup
-        soup = BeautifulSoup(res.text, 'html.parser')
+    # Initialize a dictionary to store the latest exchange rate record for each currency
+    latest_exchange_rates = {}
 
-        # Find the exchange rate element and extract the value attribute
-        exchange_rate = soup.find('span', {'class': 'DFlfde', 'data-precision': '2', 'data-value': True})['data-value']
+    # Query for the latest exchange rate record for each currency
+    for currency_code in currencies_to_countries:
+        query = client.query(kind='exchange_rates')
+        query.add_filter('to_currency_code', '=', currency_code)
+        query.order = ['-timestamp']
+        result = list(query.fetch(limit=1))
 
-        # Add the exchange rate to the dictionary
-        exchange_rates[currency] = exchange_rate
+        if result:
+            entity = result[0]
+            exchange_rate_record = {
+                'to_currency_code': entity['to_currency_code'],
+                'equivalent_value': entity['to'],
+                'last_updated_on': entity['timestamp']
+            }
+            # Use the currencies_to_countries mapping to get the country name
+            exchange_rate_record['country'] = currencies_to_countries[entity['to_currency_code']]
+            latest_exchange_rates[currency_code] = exchange_rate_record
 
-        # Create an entity and set its properties
+    # Convert the dictionary to a list of records and sort by currency code
+    exchange_rates_records = sorted(list(latest_exchange_rates.values()), key=lambda x: x['to_currency_code'])
 
-        entity = datastore.Entity(key=client.key('exchange_rates'))
-        entity.update({
-            'timestamp': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'date': datetime.datetime.now().strftime('%Y-%m-%d'),  # Add the date property
-            'from_currency_code': 'USD',
-            'from': 1,
-            'to_currency_code': currency,
-            'to': float(exchange_rate)
-        })
-
-        # Insert the entity into the Datastore
-        
-        client.put(entity)
-
-    return "Exchange rates updated successfully"
+    # Render the exchange rates template with the records
+    return render_template('exchange_rates.html', records=exchange_rates_records)

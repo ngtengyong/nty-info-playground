@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Exchange Rates</title>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>Country</th>
+                <th>Currency</th>
+                <th>Equivalent Value of 1 USD</th>
+                <th>Last Updated On</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in records %}
+            <tr>
+                <td>{{ record['country'] }}</td>
+                <td>{{ record['to_currency_code'] }}</td>
+                <td>{{ record['equivalent_value'] }}</td>
+                <td>{{ record['last_updated_on'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        
+    </table>
+</body>
+</html>

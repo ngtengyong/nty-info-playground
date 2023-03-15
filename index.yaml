@@ -1,0 +1,6 @@
+indexes:
+- kind: exchange_rates
+  properties:
+  - name: to_currency_code
+  - name: timestamp
+    direction: desc
