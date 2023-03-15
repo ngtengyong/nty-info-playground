@@ -16,53 +16,30 @@
 </head>
 <body>
     <body>
-        <div id="map" style="height: 500px;"></div>
+        <div id="map" style="height: 1000px;"></div>
       </body>
-
-           
-    <table>
-        <thead>
-            <tr>
-                <th>Country</th>
-                <th>Currency</th>
-                <th>Equivalent Value of 1 USD</th>
-                <th>Last Updated On</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for record in records %}
-            <tr>
-                <td>{{ record['country'] }}</td>
-                <td>{{ record['to_currency_code'] }}</td>
-                <td>{{ record['equivalent_value'] }}</td>
-                <td>{{ record['last_updated_on'] }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
     <script>
+        var countries = {{ countries|tojson }};
+        var map = L.map('map').setView({{ map_center|tojson }}, {{ zoom_level }});
 
-var countries = {{ countries|tojson }};
-var map = L.map('map').setView([10, 105], 4);
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-    '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-    'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-  maxZoom: 18
-}).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+            '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+            'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+        maxZoom: 18
+        }).addTo(map);
 
 
-for (var i = 0; i < countries.length; i++) {
-    var country = countries[i];
-    var valueStr = country.value.toFixed(2) + " " + country.currency;
-    var markerIcon = L.divIcon({
-        className: 'custom-icon',
-        html: '<div class="marker-box">' + valueStr + '</div>',
-        iconAnchor: [10, 20]
-    });
-    var marker = L.marker(country.latlng, { icon: markerIcon }).addTo(map);
-}
+        for (var i = 0; i < countries.length; i++) {
+            var country = countries[i];
+            var valueStr = country.value.toFixed(2) + " " + country.currency;
+            var markerIcon = L.divIcon({
+                className: 'custom-icon',
+                html: '<div class="marker-box">' + valueStr + '</div>',
+                iconAnchor: [10, 20]
+            });
+            var marker = L.marker(country.latlng, { icon: markerIcon }).addTo(map);
+        }
     </script>
 </body>
 </html>

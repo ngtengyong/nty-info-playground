@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask ,redirect ,url_for
 
 # app = Flask(__name__)
 app = Flask(__name__, static_folder='img')
@@ -13,7 +13,7 @@ app.register_blueprint(exchange_rates_bp)
 
 @app.route('/')
 def index():
-    return 'Welcome to the Exchange Rate API!'
+    return redirect(url_for('exchange_rates.display_exchange_rates'))
 
 if __name__ == '__main__':
     app.run()
