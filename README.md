@@ -1,24 +1,18 @@
-# Daily Currency exchange rates for South East Asia
+# NTY Info Playground
 
-url: https://nty-info-center.as.r.appspot.com
+<p>
+The url : https://nty-info-center.as.r.appspot.com
+</p>
+
+## Project 1 - A map that shows exchange rate of south east asia currencies against 1 US Dollar
+<p>
+The is a simple project, it is never intended for any commercial use or even currencies trading sort of business. 
+It is purely meant for educational, it is for me to beef up again skill in Python.
 <br>
-latest exchange rates url: https://nty-info-center.as.r.appspot.com/exchange-rates
+This project basically contains. 
 <br>
+1. A Restful Web API that google exchange rates and insert into Google datastore. (POST https://nty-info-center.as.r.appspot.com/exchange-rates)
+2. A web page that display and map and show the daily exchange rates (https://nty-info-center.as.r.appspot.com/exchange-rates). 
+3. I use google scheduler to call the web api once in a day at 8am UTC + 8.
+</p>
 
-* Compile the app<br>
-```python main.py```
-
-* Deploy app to Google Appengine<br>
-```gcloud app deploy```
-
-* Browse the website<br>
-```gcloud app browse```
-
-* Deploy Datastore indexes based on index.yaml<br>
-```gcloud app deploy index.yaml```
-
-* Clean up unused indexes based and keep what's mentioned in index.yaml<br>
-```gcloud datastore indexes cleanup index.yaml```
-
-* Install required package <br>
-```pip install -r requirements.txt```
