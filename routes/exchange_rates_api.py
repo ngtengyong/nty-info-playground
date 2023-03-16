@@ -1,8 +1,9 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, request
 import requests
 from bs4 import BeautifulSoup
 from google.cloud import datastore
 import datetime
+import requests
 
 exchange_rates_api_bp = Blueprint('exchange_rates_api', __name__)
 
@@ -15,6 +16,29 @@ def fetch_exchange_rates():
 
     # Create a client to interact with the Datastore API
     client = datastore.Client()
+
+    # Get API key and secret from request
+    # api_data = request.get_json()
+    # apiKey = api_data['key']
+    # apiSecret = api_data['secret']
+    apiKey = request.json.get('key')
+    apiSecret = request.json.get('secret')
+
+    # check if apiKey and apiSecret are provided in the request
+    if apiKey is None or apiSecret is None:
+        # Missing apiKey or apiSecret, return 400 status
+        return "", 400
+
+    # validate against records in api_access kind
+    queryApi = client.query(kind='api_access')
+    queryApi.add_filter('key', '=', apiKey)
+    queryApi.add_filter('secret', '=', apiSecret)
+    api_entity = queryApi.fetch()
+
+    api_entity_list = list(api_entity)
+    if not api_entity_list:
+        # Unauthorized access, return 403 status
+        return "Unauthorized access attempted", 403
 
     # Get the exchange rates from the previous day
     query = client.query(kind='exchange_rates')

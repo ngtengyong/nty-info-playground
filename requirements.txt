@@ -6,3 +6,4 @@ protobuf==3.20.1
 routes==2.5
 connexion[swagger-ui]==2.7.0
 geopy==2.2.0
+requests
