@@ -29,17 +29,22 @@
         maxZoom: 18
         }).addTo(map);
 
-
         for (var i = 0; i < countries.length; i++) {
             var country = countries[i];
-            var valueStr = country.value.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " " + country.currency;
+            var valueStr = country.value.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " " + country.currency +"<br/>";
+            if (country.perc_change !== null) {
+                valueStr += ' (' + (country.perc_change < 0 ? '↓ ' : '↑ ') + Math.abs(country.perc_change).toFixed(2) + '%)';
+            }
+            var style = country.perc_change !== null && country.perc_change < 0 ? 'color:red' : '';
             var markerIcon = L.divIcon({
                 className: 'custom-icon',
-                html: '<div class="marker-box">' + valueStr + '</div>',
+                html: '<div class="marker-box" style="' + style + '">' + valueStr + '</div>',
                 iconAnchor: [10, 20]
             });
             var marker = L.marker(country.latlng, { icon: markerIcon }).addTo(map);
         }
+
+
     </script>
 </body>
 </html>

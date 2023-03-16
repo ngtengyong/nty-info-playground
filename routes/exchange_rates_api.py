@@ -15,7 +15,12 @@ def fetch_exchange_rates():
 
     # Create a client to interact with the Datastore API
     client = datastore.Client()
-    
+
+    # Get the exchange rates from the previous day
+    query = client.query(kind='exchange_rates')
+    query.add_filter('date', '=', (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d'))
+    previous_rates = {entity['to_currency_code']: entity['to'] for entity in query.fetch()}
+
     # Iterate over each currency and fetch the exchange rate
     for currency in currencies:
         url = f"https://www.google.com/search?q=1+USD+to+{currency}"
@@ -27,6 +32,13 @@ def fetch_exchange_rates():
 
         # Find the exchange rate element and extract the value attribute
         exchange_rate = soup.find('span', {'class': 'DFlfde', 'data-precision': '2', 'data-value': True})['data-value']
+
+        # Calculate the percentage change from the previous day
+        previous_rate = previous_rates.get(currency, None)
+        if previous_rate is not None:
+            percentage_change = -1 *((float(exchange_rate) - previous_rate) / previous_rate * 100)
+        else:
+            percentage_change = None
 
         # Add the exchange rate to the dictionary
         exchange_rates[currency] = exchange_rate
@@ -40,7 +52,8 @@ def fetch_exchange_rates():
             'from': 1,
             'to_currency_code': currency,
             'to_currency_country': currencies_to_countries[currency],  # Add the to_currency_country property
-            'to': float(exchange_rate)
+            'to': float(exchange_rate),
+            'percentage_change': percentage_change  # Add the percentage_change property
         })
 
         # Insert the entity into the Datastore

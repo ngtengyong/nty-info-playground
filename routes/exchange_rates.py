@@ -40,7 +40,8 @@ def display_exchange_rates():
                 'currency': entity['to_currency_code'],
                 'value': entity['to'],
                 'last_updated_on': entity['timestamp'],
-                'name': country_name
+                'name': country_name,
+                'perc_change' : entity['percentage_change']
             }
 
             # Get the latlng of the country
