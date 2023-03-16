@@ -12,7 +12,9 @@ It is purely meant for educational, it is for me to beef up again skill in Pytho
 This project basically contains. 
 <br>
 1. A Restful Web API that google exchange rates and insert into Google datastore. (POST https://nty-info-center.as.r.appspot.com/exchange-rates)
+
 2. A web page that display and map and show the daily exchange rates (https://nty-info-center.as.r.appspot.com/exchange-rates). 
+
 3. I use google scheduler to call the web api once in a day at 8am UTC + 8.
 </p>
 
