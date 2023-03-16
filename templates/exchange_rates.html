@@ -32,7 +32,7 @@
 
         for (var i = 0; i < countries.length; i++) {
             var country = countries[i];
-            var valueStr = country.value.toFixed(2) + " " + country.currency;
+            var valueStr = country.value.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " " + country.currency;
             var markerIcon = L.divIcon({
                 className: 'custom-icon',
                 html: '<div class="marker-box">' + valueStr + '</div>',

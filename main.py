@@ -1,4 +1,5 @@
-from flask import Flask ,redirect ,url_for
+from flask import Flask,render_template
+from datetime import datetime
 
 # app = Flask(__name__)
 app = Flask(__name__, static_folder='img')
@@ -13,7 +14,8 @@ app.register_blueprint(exchange_rates_bp)
 
 @app.route('/')
 def index():
-    return redirect(url_for('exchange_rates.display_exchange_rates'))
+    current_year = datetime.now().year
+    return render_template('index.html', current_year=current_year)
 
 if __name__ == '__main__':
     app.run()
