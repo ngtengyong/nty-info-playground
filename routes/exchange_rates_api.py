@@ -17,33 +17,27 @@ def fetch_exchange_rates():
     # Create a client to interact with the Datastore API
     client = datastore.Client()
 
-    # Get API key and secret from request
-    # api_data = request.get_json()
-    # apiKey = api_data['key']
-    # apiSecret = api_data['secret']
+    # check if apiKey and apiSecret are provided in the request
     apiKey = request.json.get('key')
     apiSecret = request.json.get('secret')
 
-    # check if apiKey and apiSecret are provided in the request
-    if apiKey is None or apiSecret is None:
-        # Missing apiKey or apiSecret, return 400 status
-        return "", 400
-
-    # validate against records in api_access kind
-    queryApi = client.query(kind='api_access')
-    queryApi.add_filter('key', '=', apiKey)
-    queryApi.add_filter('secret', '=', apiSecret)
-    api_entity = queryApi.fetch()
-
-    api_entity_list = list(api_entity)
-    if not api_entity_list:
+    if not validate_access(apiKey, apiSecret):
         # Unauthorized access, return 403 status
         return "Unauthorized access attempted", 403
 
-    # Get the exchange rates from the previous day
-    query = client.query(kind='exchange_rates')
-    query.add_filter('date', '=', (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d'))
-    previous_rates = {entity['to_currency_code']: entity['to'] for entity in query.fetch()}
+    # Iterate over each currency and fetch the last rates of yesterday
+    previous_rates = {}
+    for currency in currencies:
+        query = client.query(kind='exchange_rates')
+        query.add_filter('date', '=', (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d'))
+        query.add_filter('to_currency_code', '=', currency)
+        query.order = ['-timestamp']
+        previous_rates_entity = list(query.fetch(limit=1))
+        if previous_rates_entity:
+            previous_rate = previous_rates_entity[0]['to']
+            previous_rates[currency] = previous_rate 
+
+    print(f'Yesterday rates: {previous_rates}')
 
     # Iterate over each currency and fetch the exchange rate
     for currency in currencies:
@@ -56,6 +50,7 @@ def fetch_exchange_rates():
 
         # Find the exchange rate element and extract the value attribute
         exchange_rate = soup.find('span', {'class': 'DFlfde', 'data-precision': '2', 'data-value': True})['data-value']
+        print(f"Today's rate : {exchange_rate}")
 
         # Calculate the percentage change from the previous day
         previous_rate = previous_rates.get(currency, None)
@@ -84,3 +79,25 @@ def fetch_exchange_rates():
         client.put(entity)
 
     return "Exchange rates updated successfully"
+
+def validate_access(apiKey, apiSecret):
+    # check if apiKey and apiSecret are provided
+    if apiKey is None or apiSecret is None:
+        # Missing apiKey or apiSecret, return 400 status
+        return False
+    
+    # Create a client to interact with the Datastore API
+    client = datastore.Client()
+    
+    # validate against records in api_access kind
+    queryApi = client.query(kind='api_access')
+    queryApi.add_filter('key', '=', apiKey)
+    queryApi.add_filter('secret', '=', apiSecret)
+    api_entity = queryApi.fetch()
+
+    api_entity_list = list(api_entity)
+    if not api_entity_list:
+        # Unauthorized access
+        return False
+    
+    return True

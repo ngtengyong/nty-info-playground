@@ -33,7 +33,7 @@
             var country = countries[i];
             var valueStr = country.value.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + " " + country.currency +"<br/>";
             if (country.perc_change !== null) {
-                valueStr += ' (' + (country.perc_change < 0 ? '↓ ' : '↑ ') + Math.abs(country.perc_change).toFixed(2) + '%)';
+                valueStr += ' (' + (country.perc_change < 0 ? '↓ ' : country.perc_change > 0 ? '↑ ' : '') + Math.abs(country.perc_change).toFixed(2) + '%)';
             }
             var style = country.perc_change !== null && country.perc_change < 0 ? 'color:red' : '';
             var markerIcon = L.divIcon({

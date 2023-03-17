@@ -15,5 +15,8 @@
 * Clean up unused indexes based and keep what's mentioned in index.yaml<br>
 ```gcloud datastore indexes cleanup index.yaml```
 
+* List my index
+```gcloud datastore indexes list```
+
 * Install required package <br>
 ```pip install -r requirements.txt```

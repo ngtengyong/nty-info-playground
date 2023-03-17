@@ -4,3 +4,9 @@ indexes:
   - name: to_currency_code
   - name: timestamp
     direction: desc
+
+- kind: exchange_rates
+  properties:
+  - name: date
+  - name: timestamp
+    direction: desc
