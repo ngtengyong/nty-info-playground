@@ -4,12 +4,12 @@ from google.cloud import datastore
 
 get_country_data_bp = Blueprint('get_country_data', __name__)
 
-@get_country_data_bp.route('/country-data')
+@get_country_data_bp.route('/population-table')
 def country_population():
     client = datastore.Client()
     countries = []
     for country_code in ['MY', 'VN', 'PH', 'TH', 'SG', 'KH', 'MM', 'BN', 'LA', 'ID']:
-        query = client.query(kind='country')
+        query = client.query(kind='population')
         query.add_filter('country_code', '=', country_code)
         query.order = ['-timestamp']
         query.limit = 1
@@ -22,14 +22,14 @@ def country_population():
                 'timestamp': result[0]['timestamp']
             }
             countries.append(country)
-    return render_template('country_population.html', countries=countries)
+    return render_template('country_population_table.html', countries=countries)
 
-@get_country_data_bp.route('/country-chart')
+@get_country_data_bp.route('/population-chart')
 def country_population_chart():
     client = datastore.Client()
     countries = []
     for country_code in ['MY', 'VN', 'PH', 'TH', 'SG', 'KH', 'MM', 'BN', 'LA', 'ID']:
-        query = client.query(kind='country')
+        query = client.query(kind='population')
         query.add_filter('country_code', '=', country_code)
         query.order = ['-timestamp']
         query.limit = 1
