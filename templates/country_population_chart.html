@@ -1,107 +1,66 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Country Population Bar Chart</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Country Population Bar Chart and Pie Chart</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
     <style>
         #charts-container {
             display: flex;
         }
         #barChart {
-            width: 800px !important ;
-            height: 500px !important;
+            width: 50%;
+            height: 500px;
         }
         #pieChart {
-            width: 500px !important ;
-            height: 500px !important;
+            width: 50%;
+            height: 500px;
         }        
     </style>
 </head>
 <body>
-    <h1>Country Population Bar Chart</h1>
+    <h1>Country Population Bar Chart and Pie Chart</h1>
     <div id="charts-container">
-        <canvas id="barChart"></canvas>
-        <canvas id="pieChart"></canvas>
+        <div id="barChart"></div>
+        <div id="pieChart"></div>
     </div>
     <script>
-        var barCtx = document.getElementById('barChart').getContext('2d');
-        var pieCtx = document.getElementById('pieChart').getContext('2d');
-        var barChartData = {
+        var data = [
+            {% for country in countries %}
+                {
+                    x: ["{{ country.name }}"],
+                    y: [{{ country.population }}],
+                    type: "bar",
+                    name: "{{ country.name }}"
+                },
+            {% endfor %}
+        ];
+
+        var layout = {
+            title: "Country Population Bar Chart"
+        };
+
+        Plotly.newPlot("barChart", data, layout);
+
+        var data2 = [{
+            values: [
+                {% for country in countries %}
+                    {{ country.population }},
+                {% endfor %}
+            ],
             labels: [
                 {% for country in countries %}
                     "{{ country.name }}",
                 {% endfor %}
             ],
-            datasets: [{
-                label: 'Population',
-                data: [
-                    {% for country in countries %}
-                        {{ country.population }},
-                    {% endfor %}
-                ],
-                borderWidth: 1
-            }]
+            type: 'pie'
+        }];
+
+        var layout2 = {
+            title: "Country Population Pie Chart"
         };
 
-        var barChart = new Chart(barCtx, {
-            type: 'bar',
-            data: barChartData,
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
-                    }]
-                }
-            }
-        });
-
-        var pieChartData = {
-            labels: [
-                {% for country in countries %}
-                    "{{ country.name }}",
-                {% endfor %}
-            ],
-            datasets: [{
-                label: 'Population',
-                data: [
-                    {% for country in countries %}
-                        {{ country.population }},
-                    {% endfor %}
-                ]
-            }]
-        };
-
-        var pieChartOptions = {
-            responsive: true,
-            legend: {
-                position: 'right'
-            },
-            animation: {
-                animateScale: true,
-                animateRotate: true
-            },
-            tooltips: {
-                callbacks: {
-                    label: function(tooltipItem, data) {
-                        var dataset = data.datasets[tooltipItem.datasetIndex];
-                        var total = dataset.data.reduce(function(previousValue, currentValue, currentIndex, array) {
-                            return previousValue + currentValue;
-                        });
-                        var currentValue = dataset.data[tooltipItem.index];
-                        var percentage = Math.floor(((currentValue/total) * 100)+0.5);
-                        return percentage + "%";
-                    }
-                }
-            }
-        };
-
-        var pieChart = new Chart(pieCtx, {
-            type: 'pie',
-            data: pieChartData,
-            options: pieChartOptions
-        });
+        Plotly.newPlot("pieChart", data2, layout2);
     </script>
 </body>
 </html>

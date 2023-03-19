@@ -19,3 +19,4 @@ This project basically contains the following:-
 3. I use google scheduler to call the web api every 3 hours everyday day.
 </p>
 
+## Project 2 - Barchart and Piechart that display population of South East Asia
