@@ -16,6 +16,6 @@ This project basically contains the following:-
 
 2. A web page that display and map and show the daily exchange rates (https://nty-info-center.as.r.appspot.com/exchange-rates). 
 
-3. I use google scheduler to call the web api once in a day at 8am UTC + 8.
+3. I use google scheduler to call the web api every 3 hours everyday day.
 </p>
 
