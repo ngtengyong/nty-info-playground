@@ -3,6 +3,12 @@
 * Compile the app<br>
 ```python main.py```
 
+*  Initiates an authentication flow to obtain credentials for accessing Google Cloud resources. When you run this command, you will be prompted to sign in to your Google account and grant permissions to the SDK to access your account information. Once you have successfully authenticated, the SDK will store your credentials locally and use them to authorize subsequent commands.
+```gcloud auth login```
+
+* List all the projects associated with your Google Cloud account.
+```gcloud projects list```
+
 * Deploy app to Google Appengine<br>
 ```gcloud app deploy```
 

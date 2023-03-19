@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Country Population</title>
+</head>
+<body>
+    <h1>Country Population</h1>
+    <table>
+        <tr>
+            <th>Code</th>
+            <th>Country</th>
+            <th>Population</th>
+            <th>Timestamp</th>
+        </tr>
+        {% for country in countries %}
+            <tr>
+                <td>{{ country.code }}</td>
+                <td>{{ country.name }}</td>
+                <td>{{ country.population }}</td>
+                <td>{{ country.timestamp }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

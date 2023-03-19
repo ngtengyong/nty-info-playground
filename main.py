@@ -12,6 +12,13 @@ app.register_blueprint(exchange_rates_api_bp)
 from routes.exchange_rates import exchange_rates_bp
 app.register_blueprint(exchange_rates_bp)
 
+# import and register get_country_data blueprint
+from routes.get_country_data_api import get_country_data_api_bp
+app.register_blueprint(get_country_data_api_bp)
+
+from routes.get_country_data import get_country_data_bp
+app.register_blueprint(get_country_data_bp)
+
 @app.route('/')
 def index():
     current_year = datetime.now().year

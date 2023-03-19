@@ -3,12 +3,20 @@ import requests
 from bs4 import BeautifulSoup
 from google.cloud import datastore
 import datetime
-import requests
+from routes.access_validator import validate_access
 
 exchange_rates_api_bp = Blueprint('exchange_rates_api', __name__)
 
 @exchange_rates_api_bp.route('/exchange-rates', methods=['POST'])
 def fetch_exchange_rates():
+    # check if apiKey and apiSecret are provided in the request
+    apiKey = request.json.get('key')
+    apiSecret = request.json.get('secret')
+
+    # Validate access
+    if not validate_access(apiKey, apiSecret):
+        return "Access Forbidden", 403
+
     # Define a list of currency codes to fetch the exchange rates for
     currencies = ['MYR', 'VND', 'PHP', 'THB', 'SGD', 'KHR', 'MMK', 'BND', 'LAK', 'IDR']
     currencies_to_countries = {'MYR': 'Malaysia', 'VND': 'Vietnam', 'PHP': 'Philippines', 'THB': 'Thailand', 'SGD': 'Singapore', 'KHR': 'Cambodia', 'MMK': 'Myanmar', 'BND': 'Brunei', 'LAK': 'Laos', 'IDR': 'Indonesia'}
@@ -16,14 +24,6 @@ def fetch_exchange_rates():
 
     # Create a client to interact with the Datastore API
     client = datastore.Client()
-
-    # check if apiKey and apiSecret are provided in the request
-    apiKey = request.json.get('key')
-    apiSecret = request.json.get('secret')
-
-    if not validate_access(apiKey, apiSecret):
-        # Unauthorized access, return 403 status
-        return "Unauthorized access attempted", 403
 
     # Iterate over each currency and fetch the last rates of yesterday
     previous_rates = {}
@@ -65,8 +65,9 @@ def fetch_exchange_rates():
         # Create an entity and set its properties
         entity = datastore.Entity(key=client.key('exchange_rates'))
         entity.update({
-            'timestamp': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'date': datetime.datetime.now().strftime('%Y-%m-%d'),
+            #'timestamp': (datetime.datetime.utcnow() + datetime.timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S'),
+            'timestamp': datetime.datetime.utcnow(),
+            'date': (datetime.datetime.utcnow() + datetime.timedelta(hours=8)).strftime('%Y-%m-%d'),
             'from_currency_code': 'USD',
             'from': 1,
             'to_currency_code': currency,
@@ -79,25 +80,3 @@ def fetch_exchange_rates():
         client.put(entity)
 
     return "Exchange rates updated successfully"
-
-def validate_access(apiKey, apiSecret):
-    # check if apiKey and apiSecret are provided
-    if apiKey is None or apiSecret is None:
-        # Missing apiKey or apiSecret, return 400 status
-        return False
-    
-    # Create a client to interact with the Datastore API
-    client = datastore.Client()
-    
-    # validate against records in api_access kind
-    queryApi = client.query(kind='api_access')
-    queryApi.add_filter('key', '=', apiKey)
-    queryApi.add_filter('secret', '=', apiSecret)
-    api_entity = queryApi.fetch()
-
-    api_entity_list = list(api_entity)
-    if not api_entity_list:
-        # Unauthorized access
-        return False
-    
-    return True

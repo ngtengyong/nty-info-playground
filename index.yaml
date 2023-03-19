@@ -10,3 +10,9 @@ indexes:
   - name: date
   - name: timestamp
     direction: desc
+
+- kind: country
+  properties:
+  - name: country_code
+  - name: timestamp
+    direction: desc

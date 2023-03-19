@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Country Population Bar Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        #charts-container {
+            display: flex;
+        }
+        #barChart {
+            width: 800px !important ;
+            height: 500px !important;
+        }
+        #pieChart {
+            width: 500px !important ;
+            height: 500px !important;
+        }        
+    </style>
+</head>
+<body>
+    <h1>Country Population Bar Chart</h1>
+    <div id="charts-container">
+        <canvas id="barChart"></canvas>
+        <canvas id="pieChart"></canvas>
+    </div>
+    <script>
+        var barCtx = document.getElementById('barChart').getContext('2d');
+        var pieCtx = document.getElementById('pieChart').getContext('2d');
+        var barChartData = {
+            labels: [
+                {% for country in countries %}
+                    "{{ country.name }}",
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Population',
+                data: [
+                    {% for country in countries %}
+                        {{ country.population }},
+                    {% endfor %}
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        var barChart = new Chart(barCtx, {
+            type: 'bar',
+            data: barChartData,
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+
+        var pieChartData = {
+            labels: [
+                {% for country in countries %}
+                    "{{ country.name }}",
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Population',
+                data: [
+                    {% for country in countries %}
+                        {{ country.population }},
+                    {% endfor %}
+                ]
+            }]
+        };
+
+        var pieChartOptions = {
+            responsive: true,
+            legend: {
+                position: 'right'
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true
+            },
+            tooltips: {
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        var dataset = data.datasets[tooltipItem.datasetIndex];
+                        var total = dataset.data.reduce(function(previousValue, currentValue, currentIndex, array) {
+                            return previousValue + currentValue;
+                        });
+                        var currentValue = dataset.data[tooltipItem.index];
+                        var percentage = Math.floor(((currentValue/total) * 100)+0.5);
+                        return percentage + "%";
+                    }
+                }
+            }
+        };
+
+        var pieChart = new Chart(pieCtx, {
+            type: 'pie',
+            data: pieChartData,
+            options: pieChartOptions
+        });
+    </script>
+</body>
+</html>
