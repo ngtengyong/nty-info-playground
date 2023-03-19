@@ -27,9 +27,12 @@ def fetch_exchange_rates():
 
     # Iterate over each currency and fetch the last rates of yesterday
     previous_rates = {}
+    today = datetime.datetime.now()
+    yesterday = datetime.datetime(today.year, today.month, today.day, 0, 0, 0) - datetime.timedelta(days=1)
+    yesterday_end = datetime.datetime.combine(yesterday, datetime.time.max)
     for currency in currencies:
         query = client.query(kind='exchange_rates')
-        query.add_filter('date', '=', (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d'))
+        query.add_filter('timestamp', '<', yesterday_end)
         query.add_filter('to_currency_code', '=', currency)
         query.order = ['-timestamp']
         previous_rates_entity = list(query.fetch(limit=1))
@@ -38,6 +41,7 @@ def fetch_exchange_rates():
             previous_rates[currency] = previous_rate 
 
     print(f'Yesterday rates: {previous_rates}')
+
 
     # Iterate over each currency and fetch the exchange rate
     for currency in currencies:
