@@ -9,41 +9,33 @@
             max-width: 1800px;
             margin: 0 auto;
         }        
-        #charts-container {
+        .container {
             display: flex;
             flex-wrap: wrap;
         }
-        #barChart {
+        .chart{
             width: 100%;
-            height: 500px;
-        }
-        #pieChart {
-            width: 100%;
-            height: 500px;
-        }
-        #lineChart {
-            width: 100%;
-            height: 500px;
+            height: 500px;            
         }
 
         /* Media queries for adjusting chart container width on different screen sizes */
         @media only screen and (min-width: 768px) {
-            #barChart {
-                width: 50%;
-            }
-            #pieChart {
+            .chart {
                 width: 50%;
             }
         }
     </style>
 </head>
 <body>
-    <h1>Country Population Bar Chart and Pie Chart</h1>
-    <div id="charts-container">
-        <div id="barChart"></div>
-        <div id="pieChart"></div>
-        <div id="lineChart"></div>
+    <h1>South East Asia Population </h1>
+    <div id="charts-container" class="container">
+        <div id="barChart" class="chart"></div>
+        <div id="pieChart" class="chart"></div>
     </div>
+    <div id="charts-container2" class="container">
+        <div id="lineChart" class="chart"></div>
+        <div id="rateChart" class="chart"></div>
+    </div>        
     <script>
         var data = [
             {% for country in countries %}
@@ -57,7 +49,7 @@
         ];
 
         var layout = {
-            title: "Country Population Bar Chart"
+            title: "Population by country in Bar Chart"
         };
 
         Plotly.newPlot("barChart", data, layout);
@@ -77,7 +69,7 @@
         }];
 
         var layout2 = {
-            title: "Country Population Pie Chart"
+            title: "Population by country in Pie Chart"
         };
 
         Plotly.newPlot("pieChart", data2, layout2);
@@ -94,7 +86,7 @@
         ];
 
         var layout3 = {
-            title: "Country Population Line Chart",
+            title: "Population year on year (2020 t0 2021)",
             xaxis: {
                 title: "Year"
             },
@@ -103,7 +95,30 @@
             }
         };
 
-        Plotly.newPlot("lineChart", data3, layout3);        
+        Plotly.newPlot("lineChart", data3, layout3);
+
+        var data4 = [
+            {% for country in year_rate %}
+                {
+                    x: [{% for data in country.data %} {{ data.year }}, {% endfor %}],
+                    y: [{% for data in country.data %} {{ data.rate }}, {% endfor %}],
+                    type: "bar",
+                    name: "{{ country.name }}"
+                },
+            {% endfor %}
+        ];
+
+        var layout4 = {
+            title: "Population growth rate % (2020 t0 2021)",
+            xaxis: {
+                title: "Year"
+            },
+            yaxis: {
+                title: "Population"
+            }
+        };
+
+        Plotly.newPlot("rateChart", data4, layout4);         
     </script>
 </body>
 </html>
