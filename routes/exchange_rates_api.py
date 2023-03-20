@@ -30,6 +30,7 @@ def fetch_exchange_rates():
     today = datetime.datetime.now()
     yesterday = datetime.datetime(today.year, today.month, today.day, 0, 0, 0) - datetime.timedelta(days=1)
     yesterday_end = datetime.datetime.combine(yesterday, datetime.time.max)
+    print (f'date time of yesterday end : {yesterday_end}')
     for currency in currencies:
         query = client.query(kind='exchange_rates')
         query.add_filter('timestamp', '<', yesterday_end)
@@ -37,6 +38,7 @@ def fetch_exchange_rates():
         query.order = ['-timestamp']
         previous_rates_entity = list(query.fetch(limit=1))
         if previous_rates_entity:
+            print (f'previous_rates_entity = {previous_rates_entity}')
             previous_rate = previous_rates_entity[0]['to']
             previous_rates[currency] = previous_rate 
 
@@ -54,7 +56,7 @@ def fetch_exchange_rates():
 
         # Find the exchange rate element and extract the value attribute
         exchange_rate = soup.find('span', {'class': 'DFlfde', 'data-precision': '2', 'data-value': True})['data-value']
-        print(f"Today's rate : {exchange_rate}")
+        
 
         # Calculate the percentage change from the previous day
         previous_rate = previous_rates.get(currency, None)
@@ -79,6 +81,7 @@ def fetch_exchange_rates():
             'to': float(exchange_rate),
             'percentage_change': percentage_change  # Add the percentage_change property
         })
+        print(f"Today's rate = {exchange_rate}. Percentage change = {percentage_change}")
 
         # Insert the entity into the Datastore
         client.put(entity)
