@@ -15,4 +15,9 @@ indexes:
   properties:
   - name: country_code
   - name: timestamp
-    direction: desc    
+    direction: desc   
+
+- kind: population
+  properties:
+  - name: country_code
+  - name: year     

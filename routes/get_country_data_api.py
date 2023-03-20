@@ -74,7 +74,7 @@ def write_to_datastore_since_70():
         return "Access Forbidden", 403
 
     client = datastore.Client()
-    for year in range(1990, 2022):
+    for year in range(1970, 2022):
         population_data = get_population_data(year)
         for country in population_data:
             key = client.key('population')

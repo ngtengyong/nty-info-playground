@@ -5,17 +5,36 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <style>
+        body {
+            max-width: 1800px;
+            margin: 0 auto;
+        }        
         #charts-container {
             display: flex;
+            flex-wrap: wrap;
         }
         #barChart {
-            width: 50%;
+            width: 100%;
             height: 500px;
         }
         #pieChart {
-            width: 50%;
+            width: 100%;
             height: 500px;
-        }        
+        }
+        #lineChart {
+            width: 100%;
+            height: 500px;
+        }
+
+        /* Media queries for adjusting chart container width on different screen sizes */
+        @media only screen and (min-width: 768px) {
+            #barChart {
+                width: 50%;
+            }
+            #pieChart {
+                width: 50%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -23,6 +42,7 @@
     <div id="charts-container">
         <div id="barChart"></div>
         <div id="pieChart"></div>
+        <div id="lineChart"></div>
     </div>
     <script>
         var data = [
@@ -61,6 +81,29 @@
         };
 
         Plotly.newPlot("pieChart", data2, layout2);
+
+        var data3 = [
+            {% for country in year_countries %}
+                {
+                    x: [{% for data in country.data %} {{ data.year }}, {% endfor %}],
+                    y: [{% for data in country.data %} {{ data.population }}, {% endfor %}],
+                    type: "line",
+                    name: "{{ country.name }}"
+                },
+            {% endfor %}
+        ];
+
+        var layout3 = {
+            title: "Country Population Line Chart",
+            xaxis: {
+                title: "Year"
+            },
+            yaxis: {
+                title: "Population"
+            }
+        };
+
+        Plotly.newPlot("lineChart", data3, layout3);        
     </script>
 </body>
 </html>
