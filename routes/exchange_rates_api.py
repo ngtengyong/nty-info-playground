@@ -9,12 +9,13 @@ exchange_rates_api_bp = Blueprint('exchange_rates_api', __name__)
 
 @exchange_rates_api_bp.route('/exchange-rates', methods=['POST'])
 def fetch_exchange_rates():
-    # check if apiKey and apiSecret are provided in the request
-    apiKey = request.json.get('key')
-    apiSecret = request.json.get('secret')
+    # check if apiKey is provided in the request headers
+    apiKey = request.headers.get('x-api-key')
+    if not apiKey:
+        return "Missing of X-API-Key", 401
 
     # Validate access
-    if not validate_access(apiKey, apiSecret):
+    if not validate_access(apiKey):
         return "Access Forbidden", 403
 
     # Define a list of currency codes to fetch the exchange rates for

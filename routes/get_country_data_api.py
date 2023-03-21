@@ -31,16 +31,17 @@ def get_population_data(year):
 
 @get_country_data_api_bp.route('/populate', methods=['POST'])
 def write_to_datastore(year = None):
-    # check if apiKey and apiSecret are provided in the request
-    apiKey = request.json.get('key')
-    apiSecret = request.json.get('secret')
+    # check if apiKey is provided in the request headers
+    apiKey = request.headers.get('x-api-key')
+    if not apiKey:
+        return "Missing of X-API-Key", 401
     
     # Retrieve the year value from the query string
     if year is None:
         year = request.args.get('year')
 
     # Validate access
-    if not validate_access(apiKey, apiSecret):
+    if not validate_access(apiKey):
         return "Access Forbidden", 403
 
     client = datastore.Client()
