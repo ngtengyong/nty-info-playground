@@ -12,23 +12,28 @@ def get_latlng(country):
     else:
         return None
     
+# Create a client to interact with the Datastore API
+client = datastore.Client()
+
+# Define a function to get the currency code from the country name
+def get_currency_code(country_name):
+    query = client.query(kind='country_currency')
+    query.add_filter('country_name', '=', country_name)
+    result = list(query.fetch())
+    if result:
+        return result[0]['currency_code']
+    else:
+        return None    
+    
 @exchange_rates_bp.route('/exchange-rates', methods=['GET'])
 def display_exchange_rates():
-    # Define a dictionary mapping currency codes to country names
-    currencies_to_countries = {
-        'MYR': 'Malaysia', 'VND': 'Vietnam', 'PHP': 'Philippines', 'THB': 'Thailand', 
-        'SGD': 'Singapore', 'KHR': 'Cambodia', 'MMK': 'Myanmar', 'BND': 'Brunei', 
-        'LAK': 'Laos', 'IDR': 'Indonesia'
-    }
-
-    # Create a client to interact with the Datastore API
-    client = datastore.Client()
-
+    country_names = ['Malaysia', 'Vietnam', 'Philippines', 'Thailand', 'Singapore', 'Cambodia', 'Myanmar', 'Brunei', 'Laos', 'Indonesia','China','Japan','India','South Korea']
     # Initialize a list to store the countries
     countries = []
 
     # Query for the latest exchange rate record for each currency and map it to its country
-    for currency_code, country_name in currencies_to_countries.items():
+    for country in country_names:
+        currency_code = get_currency_code(country)
         query = client.query(kind='exchange_rates')
         query.add_filter('to_currency_code', '=', currency_code)
         query.order = ['-timestamp']
@@ -40,7 +45,7 @@ def display_exchange_rates():
                 'currency': entity['to_currency_code'],
                 'value': entity['to'],
                 'last_updated_on': entity['timestamp'],
-                'name': country_name,
+                'name': country,
                 'perc_change' : entity['percentage_change']
             }
 

@@ -28,7 +28,6 @@ def get_population_data(year):
             print(f"No population data found for {country_code} in {year}")
     return population_data
 
-
 @get_country_data_api_bp.route('/populate', methods=['POST'])
 def write_to_datastore(year = None):
     # check if apiKey is provided in the request headers

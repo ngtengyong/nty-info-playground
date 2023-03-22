@@ -45,7 +45,6 @@ def fetch_exchange_rates():
 
     print(f'Yesterday rates: {previous_rates}')
 
-
     # Iterate over each currency and fetch the exchange rate
     for currency in currencies:
         url = f"https://www.google.com/search?q=1+USD+to+{currency}"
@@ -88,3 +87,85 @@ def fetch_exchange_rates():
         client.put(entity)
 
     return "Exchange rates updated successfully"
+
+@exchange_rates_api_bp.route('/country-currency', methods=['POST'])
+def insert_country_currecy():
+    # check if apiKey is provided in the request headers
+    apiKey = request.headers.get('x-api-key')
+    if not apiKey:
+        return "Missing of X-API-Key", 401
+
+    # Validate access
+    if not validate_access(apiKey):
+        return "Access Forbidden", 403
+
+    # Define the REST Countries API endpoint
+    url = "https://restcountries.com/v3.1/all"
+
+    # Make a GET request to the API and retrieve the JSON data
+    response = requests.get(url)
+    data = response.json()
+
+    # Initialize a Google Datastore client
+    client = datastore.Client()
+
+    # Define the Datastore Kind
+    kind = "country_currency"
+
+    # Loop through the data and insert each currency code and country name into Datastore
+    for country in data:
+        if "currencies" in country:
+            currency_code = list(country["currencies"].keys())[0]
+        else:
+            currency_code = "Unknown"
+
+        country_name = country["name"]["common"]
+        
+        # Get the country code, if it exists
+        if "cca2" in country:
+            country_code = country["cca2"]
+        else:
+            country_code = "Unknown"
+
+        print (f'country = {country_name} ({country_code}) currency code = {currency_code} ')    
+
+        # Define a new Datastore entity
+        entity = datastore.Entity(key=client.key(kind))
+        entity.update({
+            "currency_code": currency_code,
+            "country_name": country_name,
+            "country_code": country_code
+        })
+
+        # Insert the entity into Datastore
+        client.put(entity)
+    return "insert country currency successfully"
+
+@exchange_rates_api_bp.route('/country-to-watch', methods=['POST'])
+def write_countries_to_datastore():
+    # Create a Datastore client
+    client = datastore.Client()
+
+    # Open the CSV file and read the data
+    with open('countries.csv', 'r') as file:
+        data = file.readlines()
+
+    # Remove the header row
+    data = data[1:]
+
+    # Loop through the data and create entities for each country
+    entities = []
+    for line in data:
+        country_name, country_code = line.strip().split(',')
+        entity = datastore.Entity(key=client.key('country_to_watch'))
+        entity.update({
+            'country_name': country_name,
+            'country_code': country_code,
+        })
+        entities.append(entity)
+
+    # Write the entities to Datastore
+    client.put_multi(entities)
+
+    print(f"{len(entities)} entities written to Datastore.")
+    return "insert country currency successfully"
