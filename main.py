@@ -19,6 +19,9 @@ app.register_blueprint(get_country_data_api_bp)
 from routes.get_country_data import get_country_data_bp
 app.register_blueprint(get_country_data_bp)
 
+from routes.setup_api import setup_api_bp
+app.register_blueprint(setup_api_bp)
+
 @app.route('/')
 def index():
     current_year = datetime.now().year
