@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template
 from google.cloud import datastore
 from geopy.geocoders import Nominatim
+from routes.get_currencies_to_countries import get_currencies
 
 exchange_rates_bp = Blueprint('exchange_rates', __name__)
 
@@ -27,13 +28,12 @@ def get_currency_code(country_name):
     
 @exchange_rates_bp.route('/exchange-rates', methods=['GET'])
 def display_exchange_rates():
-    country_names = ['Malaysia', 'Vietnam', 'Philippines', 'Thailand', 'Singapore', 'Cambodia', 'Myanmar', 'Brunei', 'Laos', 'Indonesia','China','Japan','India','South Korea']
     # Initialize a list to store the countries
     countries = []
+    currencies = get_currencies()
 
     # Query for the latest exchange rate record for each currency and map it to its country
-    for country in country_names:
-        currency_code = get_currency_code(country)
+    for currency_code, country_name in currencies.items():
         query = client.query(kind='exchange_rates')
         query.add_filter('to_currency_code', '=', currency_code)
         query.order = ['-timestamp']
@@ -45,13 +45,12 @@ def display_exchange_rates():
                 'currency': entity['to_currency_code'],
                 'value': entity['to'],
                 'last_updated_on': entity['timestamp'],
-                'name': country,
+                'name': country_name,
                 'perc_change' : entity['percentage_change']
             }
 
             # Get the latlng of the country
-            exchange_rate_record['latlng'] = get_latlng(exchange_rate_record['name'])
-
+            exchange_rate_record['latlng'] = get_latlng(country_name)
             # Append the exchange rate record to the list of countries
             countries.append(exchange_rate_record)
 
