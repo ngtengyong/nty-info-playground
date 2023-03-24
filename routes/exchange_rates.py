@@ -57,8 +57,8 @@ def display_exchange_rates():
     # Sort the list of countries by currency code
     countries = sorted(countries, key=lambda x: x['currency'])
     # Set the initial center and zoom level of the map
-    map_center = [10, 105]  # Geographical coordinates of Southeast Asia
-    zoom_level = 5
+    map_center = [0, 120]  # Geographical coordinates of Southeast Asia
+    zoom_level = 3
 
     # Render the exchange rates template with the list of countries
     return render_template('exchange_rates.html', countries=countries, map_center=map_center, zoom_level=zoom_level)
